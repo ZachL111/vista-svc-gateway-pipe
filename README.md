@@ -1,68 +1,40 @@
 # vista-svc-gateway-pipe
 
-`vista-svc-gateway-pipe` is a focused Kotlin codebase around design a Kotlin verification harness for gateway systems, covering constraint solving, bounded scenario files, and failure-oriented tests. It is meant to be easy to inspect, run, and extend without a hosted service.
+`vista-svc-gateway-pipe` is a compact Kotlin repository for backend services, centered on this goal: Design a Kotlin verification harness for gateway systems, covering constraint solving, bounded scenario files, and failure-oriented tests.
 
-## Vista Svc Gateway Pipe Walkthrough
+## Why It Exists
 
-I would read the project from the outside in: command, fixture, model, then roadmap. That keeps the backend services idea grounded in files that can be checked locally.
+The point is to make a small domain rule concrete enough that a reader can change it and immediately see what broke.
 
-## Capabilities
+## Vista Svc Gateway Pipe Review Notes
 
-- Includes extended examples for queue pressure, including `surge` and `degraded`.
-- Documents bounded workers tradeoffs in `docs/operations.md`.
-- Runs locally with a single verification command and no external credentials.
-- Stores project constants and verification metadata in `metadata/project.json`.
-- Adds a repository audit script that checks structure before running the language verifier.
+The first comparison I would make is `session drift` against `queue pressure` because it shows where the rule is most opinionated.
 
-## Reason For The Project
+## Features
 
-This project keeps the domain idea close to the tests. That makes it useful as a reference implementation, a small experiment, or a starting point for a more specialized tool.
+- `fixtures/domain_review.csv` adds cases for queue pressure and retry load.
+- `metadata/domain-review.json` records the same cases in structured form.
+- `config/review-profile.json` captures the read order and the two review questions.
+- `examples/vista-svc-gateway-walkthrough.md` walks through the case spread.
+- The Kotlin code includes a review path for `session drift` and `queue pressure`.
+- `docs/field-notes.md` explains the strongest and weakest cases.
 
-## Where Things Live
+## Architecture Notes
 
-- `src`: primary implementation
-- `tests`: verification harness
-- `fixtures`: compact golden scenarios
-- `examples`: expanded scenario set
-- `metadata`: project constants and verification metadata
-- `docs`: operations and extension notes
-- `scripts`: local verification and audit commands
+The repository has two validation layers: the original compact policy fixture and the domain review fixture. They are separate so one can change without hiding failures in the other.
 
-## How It Is Put Together
+The Kotlin implementation avoids hidden state so fixture changes are easy to reason about.
 
-The design is intentionally direct: parse or construct a signal, score it, classify it, and verify the expected branch. This makes the repository useful for studying backend services behavior without needing a service or database unless the language project itself is SQL. The Kotlin version keeps data classes and model logic close together for a JVM-friendly core.
-
-## Command Examples
+## Usage
 
 ```powershell
 powershell -NoProfile -ExecutionPolicy Bypass -File scripts/verify.ps1
 ```
 
-This runs the language-level build or test path against the compact fixture set.
+## Tests
 
-## Data Notes
+The check exercises the source code and the review fixture. `recovery` is the high score at 228; `stale` is the low score at 139.
 
-`examples/extended_cases.csv` adds six named cases. I kept the names plain so failures are easy to read in a terminal: baseline, pressure, surge, degraded, recovery, and boundary.
+## Limitations And Roadmap
 
-## Check The Work
-
-```powershell
-powershell -NoProfile -ExecutionPolicy Bypass -File scripts/audit.ps1
-```
-
-The audit command checks repository structure and README constraints before it delegates to the verifier.
-
-## Tradeoffs
-
-This code is local-first. It makes no claim about deployed usage and avoids credentials, hosted state, and environment-specific setup.
-
-## Possible Extensions
-
-- Add a comparison mode that shows how decisions change when one signal is adjusted.
-- Add a loader for `examples/extended_cases.csv` and promote selected cases into the language test suite.
-- Add a short report command that prints the score breakdown for a single scenario.
-- Add one more backend services fixture that focuses on a malformed or borderline input.
-
-## Getting It Running
-
-Clone the repository, enter the directory, and run the verifier. No database server, cloud account, or token is required.
+This remains a local project with deterministic fixtures. It does not depend on credentials, hosted services, or live data. Future work should add richer malformed inputs before widening the public API.
