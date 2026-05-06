@@ -1,0 +1,17 @@
+{
+  "repo": "vista-svc-gateway-pipe",
+  "thresholds": {
+    "signal": 3,
+    "slack": 2,
+    "confidence": 1,
+    "drag": 4,
+    "ship": 204,
+    "watch": 119
+  },
+  "terms": [
+    "queue pressure",
+    "retry load",
+    "worker slack",
+    "session drift"
+  ]
+}
